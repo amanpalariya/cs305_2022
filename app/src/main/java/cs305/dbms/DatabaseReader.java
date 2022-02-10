@@ -32,10 +32,4 @@ public class DatabaseReader {
             throws SQLException, IllFormedParamException, IllegalArgumentException, PrimitiveNotImplementedException {
         return stmt.executeQuery(query.getQuery(param));
     }
-
-    @Override
-    public void finalize() throws SQLException {
-        this.stmt.close();
-        this.conn.close();
-    }
 }
