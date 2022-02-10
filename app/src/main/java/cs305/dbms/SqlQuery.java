@@ -8,12 +8,15 @@ import java.util.regex.Pattern;
 
 public class SqlQuery<T> {
     private String rawQuery;
-    public final String defaultParam = "value";
+    public final String defaultParamName = "value";
 
     public SqlQuery(String rawQuery) {
         this.rawQuery = rawQuery;
     }
 
+    /*
+     * Converts standard objects into String that can be directly replaced in the SQL query
+     */
     private <R> String getSqlLiteral(R param) throws PrimitiveNotImplementedException {
         Class<?> cls = param.getClass();
         if (cls == Integer.class) {
@@ -30,7 +33,7 @@ public class SqlQuery<T> {
             return value == true ? "TRUE" : "FALSE";
         } else if (cls == String.class) {
             String value = String.class.cast(param);
-            // TODO: Manage SQL Injection
+            // TODO: Manage SQL injection in future
             return "\"" + value + "\"";
         } else if (cls == ArrayList.class) {
             ArrayList<?> value = ArrayList.class.cast(param);
@@ -42,10 +45,15 @@ public class SqlQuery<T> {
             }
             string = string + ")";
             return string;
-        }
-        throw new PrimitiveNotImplementedException(cls.getName());
+        } else {
+	    throw new PrimitiveNotImplementedException(cls.getName());
+	}
     }
 
+    /*
+     * An object here is a type whose properties have to replaced in the query 
+     * A non-object always replaces the ${value} in the SQL query
+     */
     private boolean isObject(T param) {
         Class<?> cls = param.getClass();
         Class<?> nonObjectClass[] = { Integer.class, Float.class, Double.class, Boolean.class, String.class,
@@ -58,13 +66,19 @@ public class SqlQuery<T> {
         return true;
     }
 
+    /*
+     * This function blindly replaces ${`paramName`} with the `literal`
+     */
     private String getQuerySubstitutedWithSqlLiteral(String query, String paramName, String literal) {
         return query.replaceAll("\\$\\{" + paramName + "\\}", literal);
     }
 
+    /*
+     * For a given `param` object, replaces ${paramName} in SQL query with `param.paramName`
+     */
     private String getQuerySubstitutedWithObject(T param)
             throws IllFormedParamException, IllegalArgumentException, PrimitiveNotImplementedException {
-        Pattern pattern = Pattern.compile("\\$\\{([\\w_][\\w\\d_]*)\\}");
+        Pattern pattern = Pattern.compile("\\$\\{([\\w_][\\w\\d_]*)\\}"); // RegEx for finding ${paramName}
         Matcher matcher = pattern.matcher(this.rawQuery);
         String query = this.rawQuery;
         while (matcher.find()) {
@@ -81,7 +95,7 @@ public class SqlQuery<T> {
     }
 
     private String getQuerySubstitutedWithNonObject(T param) throws PrimitiveNotImplementedException {
-        return getQuerySubstitutedWithSqlLiteral(this.rawQuery, this.defaultParam, getSqlLiteral(param));
+        return getQuerySubstitutedWithSqlLiteral(this.rawQuery, this.defaultParamName, getSqlLiteral(param));
     }
 
     public String getQuery(T param)
