@@ -34,6 +34,9 @@ public class MySqlRunner {
         }
     }
 
+    /*
+     * Convert the current row of `resultSet` to `R`
+     */
     private <R> R mapResultSet(ResultSet resultSet, Class<R> cls)
             throws InvalidReturnTypeException {
         try {
@@ -48,6 +51,9 @@ public class MySqlRunner {
         }
     }
 
+    /*
+     * Runs the SELECT query, and returns the first row so obtained 
+     */
     public <T, R> R selectOne(String queryId, T queryParam, Class<R> resultType)
             throws InconsistentParamTypeException, NoSqlTagWithGivenIdException, InvalidReturnTypeException,
             SQLException, IllFormedParamException, IllegalArgumentException, PrimitiveNotImplementedException {
@@ -57,10 +63,13 @@ public class MySqlRunner {
 
         SqlQuery<T> sqlQuery = new SqlQuery<>(sqlTag.getQuery());
         ResultSet resultSet = this.dbReader.executeQuery(sqlQuery, queryParam);
-        resultSet.next();
+        resultSet.next(); // Advance to the first row
         return mapResultSet(resultSet, resultType);
     }
 
+    /*
+     * Runs all the SELECT query, and returns the first row so obtained
+     */
     public <T, R> List<R> selectMany(String queryId, T queryParam, Class<R> resultType)
             throws SQLException, InvalidReturnTypeException, NoSqlTagWithGivenIdException, IllFormedParamException,
             InconsistentParamTypeException, IllegalArgumentException, PrimitiveNotImplementedException {
@@ -77,6 +86,10 @@ public class MySqlRunner {
         return results;
     }
 
+    /*
+     * Handles the INSERT, DELETE, and UPDATE queries
+     * Returns the number of rows affected
+     */
     private <T> int handleUpdateTypeQueries(String queryId, T queryParam)
             throws InconsistentParamTypeException, NoSqlTagWithGivenIdException, SQLException, IllFormedParamException,
             IllegalArgumentException, PrimitiveNotImplementedException {
