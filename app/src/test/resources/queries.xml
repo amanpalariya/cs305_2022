@@ -14,7 +14,7 @@
      UPDATE film SET title="NEW TITLE" WHERE film_id=${value};
      ]]>
     </sql>
-    <sql id="insertActor" paramType="demo.SqlRunnerTest$Actor">
+    <sql id="insertActor" paramType="cs305.sqlrunner.MySqlRunnerTest$Actor">
      <![CDATA[
      INSERT INTO actor(first_name, last_name) VALUES(${firstName}, ${lastName});
      ]]>
