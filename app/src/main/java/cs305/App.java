@@ -17,7 +17,7 @@ public class App {
     public static void main(String[] args) {
         MySqlRunner sqlRunner;
         try {
-            sqlRunner = new MySqlRunner("sakila", "cs305", "P@$$w0rd", "src/main/resources/queries.xml");
+            sqlRunner = new MySqlRunner("sakila", "", "", "src/main/resources/queries.xml");
 
             List<Integer> filmIds = new ArrayList<>();
             filmIds.add(2);
