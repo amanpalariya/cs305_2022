@@ -15,8 +15,8 @@ public class SqlRouteFinder implements RouteFinder {
     private final String MESSAGE_TYPE_COLUMN = "MessageType";
     private final String DESTINATION_COLUMN = "Destination";
 
-    public SqlRouteFinder(String url, String tableName) throws SQLException {
-        databaseReader = new SqlDatabaseReader(url);
+    public SqlRouteFinder(SqlDatabaseReader databaseReader, String tableName) {
+        this.databaseReader = databaseReader;
         this.tableName = tableName;
     }
 

@@ -1,0 +1,8 @@
+{
+    "host": "localhost",
+    "port": 8000,
+    "db_url": "jdbc:sqlite:src/main/resources/routes.db",
+    "log_file": "src/main/resources/logs.log",
+    "route_table": "routes",
+    "log_table": "logs"
+}

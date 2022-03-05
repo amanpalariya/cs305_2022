@@ -21,20 +21,26 @@ import message_router.custom.listener.HttpListener;
 import message_router.custom.router.HttpRouter;
 import message_router.custom.router.SqlRouteFinder;
 import message_router.custom.router.SqlRouteLogger;
+import message_router.dbms.SqlDatabaseReader;
+import message_router.logger.Logger;
 
 public class App {
 
 	public static void main(String[] args) throws SecurityException, IOException, XmlParsingException, ParseException, SQLException {
 		Config.initalize("src/main/resources/config.json");
+		Logger logger = Config.getLogger();
 
-		RouteFinder routeFinder = new SqlRouteFinder(Config.getDbUrl(), Config.getRouteTableName());
-		RouteLogger routeLogger = new SqlRouteLogger(Config.getDbUrl(), Config.getLogTableName());
+		SqlDatabaseReader databaseReader = new SqlDatabaseReader(Config.getDbUrl());
+		RouteFinder routeFinder = new SqlRouteFinder(databaseReader, Config.getRouteTableName());
+		RouteLogger routeLogger = new SqlRouteLogger(databaseReader, Config.getLogTableName());
 		Router router = new HttpRouter(routeFinder, routeLogger);
+		logger.info("HttpRouter created with SqlRouteFinder and SqlRouteLogger on DB \"" + Config.getDbUrl() + "\"");
 
 		Listener listener = new HttpListener(8000);
 		listener.addSubscriber(new Subscriber() {
 			@Override
 			public Acknowledgement onReceiveMessage(Message message) {
+				logger.info("Received a message from " + message.getSender() + " with UUID " + message.getUuid());
 				return router.routeMessage(message);
 			}
 		});

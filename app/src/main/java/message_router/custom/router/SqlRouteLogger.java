@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import message_router.config.Config;
 import message_router.core.router.RouteLog;
 import message_router.core.router.RouteLogger;
 import message_router.dbms.SqlDatabaseReader;
@@ -15,8 +16,8 @@ public class SqlRouteLogger implements RouteLogger {
     private final String EVENT_TYPE_COLUMN = "EventType";
     private final String EVENT_TIME_COLUMN = "EventTime";
 
-    public SqlRouteLogger(String url, String tableName) throws SQLException {
-        databaseReader = new SqlDatabaseReader(url);
+    public SqlRouteLogger(SqlDatabaseReader databaseReader, String tableName){
+        this.databaseReader = databaseReader;
         this.tableName = tableName;
     }
 
@@ -36,7 +37,7 @@ public class SqlRouteLogger implements RouteLogger {
         try {
             databaseReader.executeUpdate(getInsertQuery(log));
         } catch (SQLException e) {
-            // TODO: Write to log
+            Config.getLogger().warning("Unable to write log to DB, error: " + e.getMessage());
         }
     }
 
