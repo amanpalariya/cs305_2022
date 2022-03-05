@@ -6,9 +6,14 @@
  * User Manual available at https://docs.gradle.org/7.2/userguide/building_java_projects.html
  */
 
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat.*
+import org.gradle.api.tasks.testing.logging.TestLogEvent.*
+
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    jacoco
+    id("org.barfuin.gradle.jacocolog") version "2.0.0"
 }
 
 repositories {
@@ -32,4 +37,10 @@ application {
 tasks.test {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+
+    testLogging {
+        events(PASSED, FAILED, SKIPPED)
+    }
+
+    finalizedBy(tasks.jacocoTestReport)
 }
