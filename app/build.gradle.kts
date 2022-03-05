@@ -30,6 +30,15 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
     implementation("org.xerial:sqlite-jdbc:3.36.0.3")
+
+    // https://mvnrepository.com/artifact/io.javalin/javalin
+    implementation("io.javalin:javalin:4.3.0")
+
+    // https://search.maven.org/artifact/org.slf4j/slf4j-simple/1.8.0-beta4/jar
+    implementation("org.slf4j:slf4j-simple:1.8.0-beta4")
+
+    // https://search.maven.org/artifact/com.fasterxml.jackson.core/jackson-databind/2.12.4/bundle
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.4")
 }
 
 application {
