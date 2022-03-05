@@ -39,6 +39,12 @@ dependencies {
 
     // https://search.maven.org/artifact/com.fasterxml.jackson.core/jackson-databind/2.12.4/bundle
     implementation("com.fasterxml.jackson.core:jackson-databind:2.12.4")
+
+    // https://mvnrepository.com/artifact/com.konghq/unirest-java
+    implementation("com.konghq:unirest-java:3.13.6")
+
+    // https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
+    implementation("com.googlecode.json-simple:json-simple:1.1.1")
 }
 
 application {

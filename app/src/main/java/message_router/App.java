@@ -3,12 +3,41 @@
  */
 package message_router;
 
-public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
+import java.io.IOException;
+import java.sql.SQLException;
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
-    }
+import org.json.simple.parser.ParseException;
+
+import message_router.config.Config;
+import message_router.core.Acknowledgement;
+import message_router.core.Message;
+import message_router.core.listener.Listener;
+import message_router.core.listener.Subscriber;
+import message_router.core.router.RouteFinder;
+import message_router.core.router.RouteLogger;
+import message_router.core.router.Router;
+import message_router.custom.XmlParsingException;
+import message_router.custom.listener.HttpListener;
+import message_router.custom.router.HttpRouter;
+import message_router.custom.router.SqlRouteFinder;
+import message_router.custom.router.SqlRouteLogger;
+
+public class App {
+
+	public static void main(String[] args) throws SecurityException, IOException, XmlParsingException, ParseException, SQLException {
+		Config.initalize("src/main/resources/config.json");
+
+		RouteFinder routeFinder = new SqlRouteFinder(Config.getDbUrl(), Config.getRouteTableName());
+		RouteLogger routeLogger = new SqlRouteLogger(Config.getDbUrl(), Config.getLogTableName());
+		Router router = new HttpRouter(routeFinder, routeLogger);
+
+		Listener listener = new HttpListener(8000);
+		listener.addSubscriber(new Subscriber() {
+			@Override
+			public Acknowledgement onReceiveMessage(Message message) {
+				return router.routeMessage(message);
+			}
+		});
+		listener.listen();
+	}
 }

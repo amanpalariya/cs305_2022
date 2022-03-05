@@ -3,12 +3,26 @@
  */
 package message_router;
 
+import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+
+import message_router.custom.XmlParsingException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 class AppTest {
-    @Test void appHasAGreeting() {
-        App classUnderTest = new App();
-        assertNotNull(classUnderTest.getGreeting(), "app should have a greeting");
+    @Test
+    void appTest() throws SecurityException, IOException, XmlParsingException, ParseException, SQLException {
+        String args[] = {};
+        assertDoesNotThrow(
+                new Executable() {
+                    public void execute() throws Throwable {
+                        App.main(args);
+                    };
+                });
     }
 }
