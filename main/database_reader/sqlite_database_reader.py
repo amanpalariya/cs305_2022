@@ -2,7 +2,7 @@ from typing import List
 
 import sqlite3
 
-from sql_database_reader import SqlDatabaseReader, DatabaseRecord
+from database_reader.sql_database_reader import SqlDatabaseReader, DatabaseRecord
 
 class SqliteDatabaseReader(SqlDatabaseReader):
     __conn: sqlite3.Connection

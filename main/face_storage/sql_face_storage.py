@@ -1,13 +1,12 @@
 from datetime import datetime
-from typing import List
+from typing import Callable, List, Tuple
 
-from sqlalchemy import Column
-from image import Image
-from person import Person
-from face_storage import FaceStorage
-from face_record import FaceRecord
-from face_image import FaceImage
-from sql_database_reader import SqlDatabaseReader
+from entities.image import Image
+from entities.person import Person
+from face_storage.face_storage import FaceStorage
+from entities.face_record import FaceRecord
+from entities.face_image import FaceImage
+from database_reader.sql_database_reader import SqlDatabaseReader
 import os
 
 class Columns:
@@ -32,7 +31,10 @@ class SqlFaceStorage(FaceStorage):
         self.__create_table_if_not_exists()
 
     def __create_folder_if_not_exists(self):
-        os.mkdir(self.__images_folder)
+        try:
+            os.mkdir(self.__images_folder)
+        except FileExistsError:
+            pass
 
     def __create_table_if_not_exists(self):
         self.__database_reader.execute(self.__get_create_table_if_not_exist_query())
@@ -70,7 +72,33 @@ class SqlFaceStorage(FaceStorage):
         query = self.__get_insert_face_record_query(face_record)
         self.__database_reader.execute(query)
 
-    def get_top_k_matches(self, face_image: FaceImage, k: int, confidence: float) -> List[Person]:
-        super().get_top_k_matches(face_image, k, confidence)
-        # TODO
-        return []
+    def __get_all_persons_query(self) -> str:
+        return f"SELECT DISTINCT {Columns.Name} FROM {self.__TABLE_NAME}"
+
+    def __get_all_persons(self) -> List[Person]:
+        result = self.__database_reader.execute_select(self.__get_all_persons_query())
+        record_to_person = lambda record: Person(record.get_value_by_column_name(Columns.Name))
+        return list(map(record_to_person, result))
+    
+    def __get_all_features_of_a_person_query(self, person: Person) -> str:
+        name_literal = self.__get_sql_string_literal(person.getName())
+        return f"SELECT {Columns.Features} FROM {self.__TABLE_NAME} WHERE {Columns.Name} IS {name_literal}"
+
+    def __get_all_features_of_a_person(self, person: Person) -> List[List[float]]:
+        result = self.__database_reader.execute_select(self.__get_all_features_of_a_person_query(person))
+        record_to_feature = lambda record: list(map(float, record.get_value_by_column_name(Columns.Features).split(' ')))
+        return list(map(record_to_feature, result))
+    
+    def __get_similarity_with_person(self, feature: List[float], person: Person, get_similarity_of_features: Callable[[List[float], List[float]], float]) -> float:
+        features = self.__get_all_features_of_a_person(person)
+        feature_to_similarity_with_person = lambda f: get_similarity_of_features(f, feature)
+        return max(map(feature_to_similarity_with_person, features))
+
+    def get_top_k_matches(self, face_image: FaceImage, k: int, get_similarity_of_features: Callable[[List[float], List[float]], float]) -> List[Tuple[Person, float]]:
+        super().get_top_k_matches(face_image, k, get_similarity_of_features)
+        all_persons = self.__get_all_persons()
+        similarity = []
+        for person in all_persons:
+            similarity.append(self.__get_similarity_with_person(face_image.getFeatures(), person, get_similarity_of_features))
+        top_k_matches = list(sorted(zip(all_persons, similarity), key= lambda x: -x[1]))[:k] # Sort in order of decreasing similarity
+        return top_k_matches

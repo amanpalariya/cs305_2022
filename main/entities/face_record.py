@@ -1,5 +1,5 @@
-from face_image import FaceImage
-from person import Person
+from entities.face_image import FaceImage
+from entities.person import Person
 
 class FaceRecord:
     __face_image: FaceImage
