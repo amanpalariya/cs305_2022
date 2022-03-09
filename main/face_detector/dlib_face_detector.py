@@ -6,6 +6,7 @@ from face_detector.face_detector import FaceDetector, FaceNotFoundError
 from entities.face_image import FaceImage
 from entities.image import Image
 import face_recognition
+import numpy as np
 
 class DlibFaceDetector(FaceDetector):
     def create_face_image_from_image(self, image: Image) -> FaceImage:
@@ -18,4 +19,4 @@ class DlibFaceDetector(FaceDetector):
     
     def get_similarity_of_features(self, feature1: List[float], feature2: List[float]) -> float:
         super().get_similarity_of_features(feature1, feature2)
-        return 1 - face_recognition.face_distance([feature1], feature2)[0]
+        return 1 - face_recognition.face_distance([np.array(feature1)], np.array(feature2))[0]

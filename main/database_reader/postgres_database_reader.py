@@ -1,17 +1,18 @@
+from asyncio import futures
 from typing import List
 
-import sqlite3
+import psycopg2
 
 from database_reader.sql_database_reader import SqlDatabaseReader, DatabaseRecord
 
-class SqliteDatabaseReader(SqlDatabaseReader):
-    __conn: sqlite3.Connection
 
-    def __init__(self, filepath: str) -> None:
+class PostgresDatabaseReader(SqlDatabaseReader):
+
+    def __init__(self, database: str, username: str, password: str, hostname: str = 'localhost', port: int = 5432) -> None:
         super().__init__()
-        self.__conn = sqlite3.connect(filepath)
+        self.__conn = psycopg2.connect(host=hostname, database=database, user=username, password=password, port=port)
 
-    def __get_columns_from_cursor(self, cursor: sqlite3.Cursor) -> List[str]:
+    def __get_columns_from_cursor(self, cursor) -> List[str]:
         return list(map(lambda x: x[0], cursor.description))
 
     def execute_select(self, query: str) -> List[DatabaseRecord]:
@@ -28,4 +29,3 @@ class SqliteDatabaseReader(SqlDatabaseReader):
         cursor.execute(query)
         self.__conn.commit()
         return cursor.rowcount
-

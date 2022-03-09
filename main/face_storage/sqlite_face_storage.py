@@ -16,7 +16,7 @@ class Columns:
     Filepath = "filepath"
 
 
-class SqlFaceStorage(FaceStorage):
+class SqliteFaceStorage(FaceStorage):
     __database_reader: SqlDatabaseReader
     __TABLE_NAME: str = "faces"
     __images_folder: str
@@ -94,11 +94,11 @@ class SqlFaceStorage(FaceStorage):
         feature_to_similarity_with_person = lambda f: get_similarity_of_features(f, feature)
         return max(map(feature_to_similarity_with_person, features))
 
-    def get_top_k_matches(self, face_image: FaceImage, k: int, get_similarity_of_features: Callable[[List[float], List[float]], float]) -> List[Tuple[Person, float]]:
-        super().get_top_k_matches(face_image, k, get_similarity_of_features)
+    def get_top_k_matches(self, face_image: FaceImage, k: int, confidence: float, get_similarity_of_features: Callable[[List[float], List[float]], float]) -> List[Tuple[Person, float]]:
+        super().get_top_k_matches(face_image, k, confidence, get_similarity_of_features)
         all_persons = self.__get_all_persons()
         similarity = []
         for person in all_persons:
             similarity.append(self.__get_similarity_with_person(face_image.getFeatures(), person, get_similarity_of_features))
-        top_k_matches = list(sorted(zip(all_persons, similarity), key= lambda x: -x[1]))[:k] # Sort in order of decreasing similarity
+        top_k_matches = list(sorted(filter(lambda x: x[0]>=confidence, zip(all_persons, similarity)), key= lambda x: -x[1]))[:k] # Sort in order of decreasing similarity
         return top_k_matches
