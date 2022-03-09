@@ -19,3 +19,7 @@ class FaceStorage(ABC):
     @abstractmethod
     def get_person_by_id(self, id: int) -> Person:
         pass
+
+    @abstractmethod
+    def close(self):
+        pass

@@ -107,3 +107,7 @@ class PostgresFaceStorage(FaceStorage):
             return Person(records[0].get_value_by_column_name(Columns.Name))
         else:
             raise NoEntryWithGivenIdError(id)
+        
+    def close(self):
+        super().close()
+        self.__database_reader.close()
