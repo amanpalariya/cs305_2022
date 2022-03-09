@@ -27,6 +27,9 @@ def generate_random_directory_name():
    return ''.join([random.choice('abcdefghijklmnopqrstuvwxyz-') for _ in range(32)])
 
 def merge_matches(matches: List[Tuple[int, Person, float]], k: int):
+   """
+   Merges matches and eliminates duplicate names among matches
+   """
    person_dict = {}
    for match in matches:
       id, person, similarity = match
@@ -65,13 +68,13 @@ async def add_faces_in_bulk(file: UploadFile =
    with ZipFile(io.BytesIO(file.file.read())) as archive:
       tempdir = Path(tempfile.gettempdir())/generate_random_directory_name()
       print(f"Extracting to {tempdir}")
-      archive.extractall(tempdir)
-      for dir in os.listdir(tempdir):
+      archive.extractall(tempdir) # Extract zip to temporary folder
+      for dir in os.listdir(tempdir): # Iterate over folders
          if Path(tempdir/dir).is_file():
             continue
-         name = dir.replace("_", " ")
+         name = dir.replace("_", " ") # Sanitize directory name to person name
          print(f"Adding {name}")
-         for image_filename in os.listdir(tempdir/dir):
+         for image_filename in os.listdir(tempdir/dir): # Iterate over images
             try:
                   image = Image.from_filepath(tempdir/dir/image_filename)
                   face_image = faceDetector.create_face_image_from_image(image)

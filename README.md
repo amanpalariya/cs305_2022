@@ -60,3 +60,6 @@ Then, check the coverage by running
 ```sh
 coverage report
 ```
+
+For adding faces in bulk, the zip file should have folder at level 0 and images inside those folders.
+The name of the folder will be taken as the name of the person in the images inside those folders.
