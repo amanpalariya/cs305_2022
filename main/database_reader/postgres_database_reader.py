@@ -29,3 +29,7 @@ class PostgresDatabaseReader(SqlDatabaseReader):
         cursor.execute(query)
         self.__conn.commit()
         return cursor.rowcount
+
+    def close(self):
+        super().close()
+        self.__conn.close()

@@ -31,3 +31,7 @@ class SqlDatabaseReader(ABC):
     @abstractmethod
     def execute(self, query: str) -> int:
         pass
+
+    @abstractmethod
+    def close(self):
+        pass
