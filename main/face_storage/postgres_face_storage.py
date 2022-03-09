@@ -17,12 +17,13 @@ class Columns:
     Similarity = "similarity"
 
 class PostgresFaceStorage(FaceStorage):
-    __TABLE_NAME: str = "faces"
+    __TABLE_NAME: str
     __GET_DISTANCE_FUNCTION_NAME = "get_distance"
 
-    def __init__(self, sql_database_reader: PostgresDatabaseReader) -> None:
+    def __init__(self, sql_database_reader: PostgresDatabaseReader, table_name: str = "faces") -> None:
         super().__init__()
         self.__database_reader = sql_database_reader
+        self.__TABLE_NAME = table_name
         self.__create_table_if_not_exists()
         self.__create_or_replace_get_distance_function()
 
