@@ -15,3 +15,7 @@ class FaceStorage(ABC):
         assert k>0, f"Number of matches 'k' must be positive integer (got {k})"
         assert 0<=confidence<=1, f"Confidence must lie in [0, 1] (got {confidence}"
         pass
+
+    @abstractmethod
+    def get_person_by_id(self, id: int) -> Person:
+        pass

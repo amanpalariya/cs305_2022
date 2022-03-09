@@ -11,6 +11,7 @@ from entities.face_image import FaceImage
 import os
 
 from database_reader.postgres_database_reader import PostgresDatabaseReader
+from face_storage.no_entry_with_given_id_error import NoEntryWithGivenIdError
 
 class Columns:
     Id = "id"
@@ -96,3 +97,13 @@ class PostgresFaceStorage(FaceStorage):
         record_to_tuple = lambda record: (record.get_value_by_column_name(Columns.Id), Person(record.get_value_by_column_name(Columns.Name)), record.get_value_by_column_name(Columns.Similarity))
         return list(map(record_to_tuple, records))
         
+    def __get_person_by_id_query(self, id) -> str:
+        return f"SELECT {Columns.Name} FROM {self.__TABLE_NAME} WHERE {Columns.Id}={id}"
+
+    def get_person_by_id(self, id: int) -> Person:
+        super().get_person_by_id(id)
+        records = self.__database_reader.execute_select(self.__get_person_by_id_query(id))
+        if len(records)>0:
+            return Person(records[0].get_value_by_column_name(Columns.Name))
+        else:
+            raise NoEntryWithGivenIdError(id)

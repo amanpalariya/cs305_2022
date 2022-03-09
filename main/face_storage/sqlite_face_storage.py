@@ -6,8 +6,10 @@ from entities.person import Person
 from face_storage.face_storage import FaceStorage
 from entities.face_record import FaceRecord
 from entities.face_image import FaceImage
-from database_reader.sql_database_reader import SqlDatabaseReader
+from database_reader.sql_database_reader import DatabaseRecord, SqlDatabaseReader
 import os
+
+from face_storage.no_entry_with_given_id_error import NoEntryWithGivenIdError
 
 class Columns:
     Id = "id"
@@ -105,3 +107,14 @@ class SqliteFaceStorage(FaceStorage):
             ids.append(id)
         top_k_matches = list(sorted(filter(lambda x: x[2]>=confidence, zip(id, all_persons, similarity)), key= lambda x: -x[2]))[:k] # Sort in order of decreasing similarity
         return top_k_matches
+
+    def __get_person_by_id_query(self, id) -> str:
+        return f"SELECT {Columns.Name} FROM {self.__TABLE_NAME} WHERE {Columns.Id}={id}"
+
+    def get_person_by_id(self, id: int) -> Person:
+        super().get_person_by_id(id)
+        records = self.__database_reader.execute_select(self.__get_person_by_id_query(id))
+        if len(records)>0:
+            return Person(records[0].get_value_by_column_name(Columns.Name))
+        else:
+            raise NoEntryWithGivenIdError(id)
