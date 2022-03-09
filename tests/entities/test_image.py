@@ -6,11 +6,11 @@ from pathlib import Path
 
 @pytest.fixture
 def test_image_filepath():
-    return 'test/resources/test.png'
+    return 'tests/resources/test.png'
 
 @pytest.fixture
 def new_image_filepath():
-    return 'test/resources/new.png'
+    return 'tests/resources/new.png'
 
 def test_from_array():
     try:
