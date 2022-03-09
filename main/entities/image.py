@@ -8,11 +8,15 @@ class Image:
     __image: PILImage
 
     def __init__(self, image: PILImage) -> None:
-        self.__image = image
+        self.__image = image.convert('RGB')
 
     @staticmethod
     def from_filepath(filepath: str) -> Image:
         return Image(PILImage.open(filepath))
+    
+    @staticmethod
+    def from_file(file) -> Image:
+        return Image(PILImage.open(file))
 
     @staticmethod
     def from_array(array: ArrayImage) -> Image:

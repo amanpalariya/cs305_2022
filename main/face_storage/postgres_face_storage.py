@@ -27,6 +27,7 @@ class PostgresFaceStorage(FaceStorage):
         super().__init__()
         self.__database_reader = sql_database_reader
         self.__create_table_if_not_exists()
+        self.__create_or_replace_get_distance_function()
 
     def __get_create_table_if_not_exist_query(self) -> str:
         return f"CREATE TABLE IF NOT EXISTS {self.__TABLE_NAME}({Columns.Id} SERIAL, {Columns.Name} VARCHAR(50), {Columns.Features} FLOAT[])"
@@ -70,23 +71,24 @@ class PostgresFaceStorage(FaceStorage):
     def __get_top_k_matches_query(self, features: List[float], k: int, confidence: float, get_similarity_of_features: Callable[[List[float], List[float]], float]):
         features_literal = self.__get_sql_float_array_literal(features)
         return f"""
-        SELECT z.{Columns.Id} AS {Columns.Id}, z.{Columns.Name} AS {Columns.Name}, y.max_similarity AS {Columns.Similarity}
+        SELECT MIN(z.{Columns.Id}) AS {Columns.Id}, z.{Columns.Name} AS {Columns.Name}, y.max_similarity AS {Columns.Similarity}
         FROM
             (
-                SELECT x.{Columns.Name}, MAX(x.{Columns.Similarity}) AS max_similarity
+                SELECT x.{Columns.Name} as {Columns.Name}, MAX(x.{Columns.Similarity}) AS max_similarity
                 FROM 
                 (
-                    SELECT {Columns.Name}, 1-{self.__GET_DISTANCE_FUNCTION_NAME}({Columns.Features}, {features_literal}) AS {Columns.Similarity}
+                    SELECT {Columns.Name}, 1-{self.__GET_DISTANCE_FUNCTION_NAME}({Columns.Features}::FLOAT[], {features_literal}::FLOAT[]) AS {Columns.Similarity}
                     FROM {self.__TABLE_NAME}
                 ) x
                 WHERE x.{Columns.Similarity}>={confidence}
-                GROUP BY {Columns.Name}
+                GROUP BY x.{Columns.Name}
             ) y,
             (
-                SELECT {Columns.Id}, {Columns.Name}, 1-{self.__GET_DISTANCE_FUNCTION_NAME}({Columns.Features}, {features_literal}) AS {Columns.Similarity}
+                SELECT {Columns.Id}, {Columns.Name}, 1-{self.__GET_DISTANCE_FUNCTION_NAME}({Columns.Features}::FLOAT[], {features_literal}::FLOAT[]) AS {Columns.Similarity}
                 FROM {self.__TABLE_NAME}
             ) z
         WHERE y.{Columns.Name}=z.{Columns.Name} AND y.max_similarity=z.{Columns.Similarity}
+        GROUP BY (z.{Columns.Name}, y.max_similarity)
         ORDER BY y.max_similarity DESC
         LIMIT {k}
         """

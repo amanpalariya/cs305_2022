@@ -9,6 +9,9 @@ class Person:
     
     def __hash__(self) -> int:
         return hash(self.__name)
+    
+    def __eq__(self, __o: object) -> bool:
+        return type(__o)==Person and __o.getName()==self.getName()
 
     def __repr__(self) -> str:
         return f"Person(\"{self.__name}\")"
