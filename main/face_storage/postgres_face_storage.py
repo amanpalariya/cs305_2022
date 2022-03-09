@@ -68,11 +68,31 @@ class PostgresFaceStorage(FaceStorage):
     
     def __get_top_k_matches_query(self, features: List[float], k: int, confidence: float, get_similarity_of_features: Callable[[List[float], List[float]], float]):
         features_literal = self.__get_sql_float_array_literal(features)
-        return f"SELECT {Columns.Name}, MAX({Columns.Similarity}) as {Columns.Similarity} FROM (SELECT {Columns.Name}, (1-{self.__GET_DISTANCE_FUNCTION_NAME}({Columns.Features}, {features_literal})) as {Columns.Similarity} FROM {self.__TABLE_NAME}) x WHERE x.{Columns.Similarity}>={confidence} GROUP BY {Columns.Name} ORDER BY {Columns.Similarity} DESC LIMIT {k}"
+        return f"""
+        SELECT z.{Columns.Id} AS {Columns.Id}, z.{Columns.Name} AS {Columns.Name}, y.max_similarity AS {Columns.Similarity}
+        FROM
+            (
+                SELECT x.{Columns.Name}, MAX(x.{Columns.Similarity}) AS max_similarity
+                FROM 
+                (
+                    SELECT {Columns.Name}, 1-{self.__GET_DISTANCE_FUNCTION_NAME}({Columns.Features}, {features_literal}) AS {Columns.Similarity}
+                    FROM {self.__TABLE_NAME}
+                ) x
+                WHERE x.{Columns.Similarity}>={confidence}
+                GROUP BY {Columns.Name}
+            ) y,
+            (
+                SELECT {Columns.Id}, {Columns.Name}, 1-{self.__GET_DISTANCE_FUNCTION_NAME}({Columns.Features}, {features_literal}) AS {Columns.Similarity}
+                FROM {self.__TABLE_NAME}
+            ) z
+        WHERE y.{Columns.Name}=z.{Columns.Name} AND y.max_similarity=z.{Columns.Similarity}
+        ORDER BY y.max_similarity DESC
+        LIMIT {k}
+        """
 
-    def get_top_k_matches(self, face_image: FaceImage, k: int, confidence: float, get_similarity_of_features: Callable[[List[float], List[float]], float]) -> List[Tuple[Person, float]]:
+    def get_top_k_matches(self, face_image: FaceImage, k: int, confidence: float, get_similarity_of_features: Callable[[List[float], List[float]], float]) -> List[Tuple[int, Person, float]]:
         super().get_top_k_matches(face_image, k, confidence, get_similarity_of_features)
         records = self.__database_reader.execute_select(self.__get_top_k_matches_query(face_image.getFeatures(), k, confidence, get_similarity_of_features))
-        record_to_tuple = lambda record: (Person(record.get_value_by_column_name(Columns.Name)), record.get_value_by_column_name(Columns.Similarity))
+        record_to_tuple = lambda record: (record.get_value_by_column_name(Columns.Id), Person(record.get_value_by_column_name(Columns.Name)), record.get_value_by_column_name(Columns.Similarity))
         return list(map(record_to_tuple, records))
         
