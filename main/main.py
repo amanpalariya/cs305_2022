@@ -38,7 +38,6 @@ def merge_matches(matches: List[Tuple[int, Person, float]], k: int):
 @app.post("/search_faces/")
 async def search_faces(k: int = Form(...), confidence: float = Form(...), file: UploadFile =
                       File(..., description="An image file, possible containing multiple human faces.")):
-   # return {"status": "OK", "body": {"matches": [{"id": 112, "person_name": "JK Lal"}]}}
    image = Image.from_file(file.file)
    matches = []
    for face_image in faceDetector.get_all_face_images_from_image(image):
