@@ -1,17 +1,14 @@
 from datetime import datetime
 from typing import Callable, List, Tuple
 
-from scipy.misc import face
+from main.entities.image import Image
+from main.entities.person import Person
+from main.face_storage.face_storage import FaceStorage
+from main.entities.face_record import FaceRecord
+from main.entities.face_image import FaceImage
 
-from entities.image import Image
-from entities.person import Person
-from face_storage.face_storage import FaceStorage
-from entities.face_record import FaceRecord
-from entities.face_image import FaceImage
-import os
-
-from database_reader.postgres_database_reader import PostgresDatabaseReader
-from face_storage.no_entry_with_given_id_error import NoEntryWithGivenIdError
+from main.database_reader.postgres_database_reader import PostgresDatabaseReader
+from main.face_storage.no_entry_with_given_id_error import NoEntryWithGivenIdError
 
 class Columns:
     Id = "id"

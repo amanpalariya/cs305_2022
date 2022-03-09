@@ -1,10 +1,8 @@
 from typing import List
 
-from pynvim import encoding
-
-from face_detector.face_detector import FaceDetector, FaceNotFoundError
-from entities.face_image import FaceImage
-from entities.image import Image
+from main.face_detector.face_detector import FaceDetector, FaceNotFoundError
+from main.entities.face_image import FaceImage
+from main.entities.image import Image
 import face_recognition
 import numpy as np
 

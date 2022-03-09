@@ -1,8 +1,8 @@
 from typing import List, Callable, Tuple
 from abc import ABC, abstractmethod
-from entities.face_record import FaceRecord
-from entities.face_image import FaceImage
-from entities.person import Person
+from main.entities.face_record import FaceRecord
+from main.entities.face_image import FaceImage
+from main.entities.person import Person
 
 class FaceStorage(ABC):
 

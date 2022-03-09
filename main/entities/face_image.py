@@ -1,6 +1,6 @@
 from typing import List
 
-from entities.image import Image
+from main.entities.image import Image
 
 class FaceImage:
     __features: List[float]

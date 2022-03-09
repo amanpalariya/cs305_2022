@@ -7,16 +7,15 @@ import tempfile
 from pathlib import Path
 import random
 
-from soupsieve import match
-from database_reader.postgres_database_reader import PostgresDatabaseReader
-from entities.face_record import FaceRecord
+from main.database_reader.postgres_database_reader import PostgresDatabaseReader
+from main.entities.face_record import FaceRecord
 
-from entities.person import Person
-from entities.image import Image
-from face_detector.dlib_face_detector import DlibFaceDetector
-from face_detector.face_detector import FaceNotFoundError
-from face_storage.no_entry_with_given_id_error import NoEntryWithGivenIdError
-from face_storage.postgres_face_storage import PostgresFaceStorage
+from main.entities.person import Person
+from main.entities.image import Image
+from main.face_detector.dlib_face_detector import DlibFaceDetector
+from main.face_detector.face_detector import FaceNotFoundError
+from main.face_storage.no_entry_with_given_id_error import NoEntryWithGivenIdError
+from main.face_storage.postgres_face_storage import PostgresFaceStorage
 
 app = FastAPI()
 

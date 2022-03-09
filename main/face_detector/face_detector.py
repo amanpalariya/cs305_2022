@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
-from entities.face_image import FaceImage
-from entities.image import Image
+from main.entities.face_image import FaceImage
+from main.entities.image import Image
 
 class FaceDetector(ABC):
     @abstractmethod

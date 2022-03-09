@@ -3,7 +3,7 @@ from typing import List
 
 import psycopg2
 
-from database_reader.sql_database_reader import SqlDatabaseReader, DatabaseRecord
+from main.database_reader.sql_database_reader import SqlDatabaseReader, DatabaseRecord
 
 
 class PostgresDatabaseReader(SqlDatabaseReader):
