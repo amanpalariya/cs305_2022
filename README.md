@@ -48,7 +48,7 @@ Then execute
 uvicorn app:app --reload
 ```
 
-To test the app, change the configuration in `app.py` and install `pytest` and `coverage`
+To test the app, change the configuration in `tests/config.py` and install `pytest` and `coverage`
 Then execute
 
 ```sh
