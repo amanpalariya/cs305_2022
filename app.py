@@ -11,7 +11,7 @@ from main.table_writer.excel_table_writer import ExcelTableWriter
 
 class Cli:
     SUPPORTED_INPUT_FILE_EXTENSIONS = ['.jpg', '.png', '']
-    SUPPORTED_OUTPUT_FILE_EXTENSIONS = ['.xlsx']
+    SUPPORTED_OUTPUT_FILE_EXTENSIONS = ['.xlsx', '.xls']
 
     def __init__(self) -> None:
         self.parser = argparse.ArgumentParser(description='Extract metadata from images of book covers and saves them')
@@ -67,7 +67,8 @@ class Cli:
         raise Exception(f'No metadata reader found for "{filename}"')
 
     def __get_metadata_writer(self, output_filename):
-        if pathlib.Path(output_filename).suffix.lower() == '.xlsx':
+        EXCEL_FORMATS = ['.xlsx', '.xls']
+        if pathlib.Path(output_filename).suffix.lower() in EXCEL_FORMATS:
             return BookMetadataWriter(ExcelTableWriter, output_filename)
         raise Exception(f'No metadata writer found for "{output_filename}"')
 

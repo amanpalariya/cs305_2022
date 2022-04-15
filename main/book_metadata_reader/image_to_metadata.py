@@ -81,7 +81,7 @@ class ImageToMetadata:
         return list(set(publishers))
 
     def __get_isbn(self, text):
-        text = text.replace('-', '').replace('\n', '')
+        text = text.replace('-', '').replace('\n', '').replace(' ', '')
 
         pat = re.compile(r'[0-9]{13}')  # A pattern of 13 digits
         match = pat.search(text)
