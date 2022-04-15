@@ -5,6 +5,6 @@ from dataclasses import dataclass
 class BookMetadata:
     title: str
     authors: List[str]
-    publisher: str
+    publishers: List[str]
     isbn: str
 
